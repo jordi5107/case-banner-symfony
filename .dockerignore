@@ -1,0 +1,27 @@
+.git
+.gitignore
+.env.local
+.env.*.local
+*.md
+
+# Cache y logs
+var/cache/
+var/log/
+var/sessions/
+
+# Dependencias (se instalan en build)
+vendor/
+node_modules/
+
+# Archivos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Tests
+tests/
+phpunit.dist.xml
+
+# Assets compilados que se regeneran
+public/assets/

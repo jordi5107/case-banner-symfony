@@ -1,0 +1,55 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Banners{% endblock %}
+
+{% block body %}
+    <div class="banners-wrapper">
+        {% for banner in banners %}
+            <div class="banner" style="background-color: {{ banner.backgroundColor }}">
+                <div class="banner-inner">
+                    {{ banner.content|raw }}
+                </div>
+            </div>
+        {% else %}
+            <div class="no-banners">
+                <p>No hay banners disponibles.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: sans-serif; }
+
+    .banners-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .banner {
+        width: 100%;
+        min-height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+
+    .banner-inner {
+        max-width: 800px;
+        width: 100%;
+    }
+
+    .no-banners {
+        padding: 4rem;
+        text-align: center;
+        color: #888;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
