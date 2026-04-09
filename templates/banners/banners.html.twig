@@ -7,7 +7,7 @@
         {% for banner in banners %}
             <div class="banner" style="background-color: {{ banner.backgroundColor }}">
                 <div class="banner-inner">
-                    {{ banner.content|raw }}
+                    {{ banner.content }}
                 </div>
             </div>
         {% else %}

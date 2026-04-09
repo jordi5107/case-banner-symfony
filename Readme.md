@@ -17,6 +17,102 @@ Además, el módulo está **dockerizado** para facilitar su desarrollo y manteni
 
 Por último, se han añadido **pruebas unitarias** con PHPUnit y seeders en las tablas para facilitar el testing.
 
+## Como se integrara en prestashop?
+
+El proyecto expone dos rutas que cubren estrategias de integración distintas. La elección depende del grado de acoplamiento tolerable con PrestaShop.
+
+### Opción A — Consumo de la API JSON
+
+La ruta `GET /api/banners?lang={locale}` devuelve un array de banners activos en JSON.
+
+Un módulo PrestaShop mínimo implementaría el hook `displayHome` realizando una llamada HTTP interna a esta API  y renderizaría el resultado con su propia propia logica del frontal.
+
+---
+
+### Opción B — Embed via iframe
+
+En lugar de devolver datos en bruto (JSON), esta ruta devuelve un fragmento de HTML ya procesado y listo para ser visualizado.
+
+La ruta GET /banners/render?lang={locale} renderiza el fragmento HTML de los banners activos, filtrados por fecha e idioma y con sus estilos incluidos.
+
+El hook displayHome de PrestaShop consume este HTML mediante una petición de servidor e inyecta el contenido directamente en el DOM.
+
+### Gestión (backoffice)
+
+El panel `/admin` de EasyAdmin (Banner Manager) funciona como herramienta **independiente**, con su propio formulario de login en `/login`. El acceso está protegido mediante `form_login` de Symfony con sesión y logout nativos.
+
+**No es necesario integrarlo dentro del backoffice de PrestaShop.** El equipo de puede acceder directamente a la URL del panel.
+
+Si se quisiera enlazar desde el backoffice de PrestaShop, la opción recomendada es un **enlace externo** al panel de Symfony, no un iframe. Los navegadores bloquean las cookies de sesión en iframes entre dominios distintos.
+
+Tambien existe la possiblidad de crear laa gestion del modulo via api, lo unico que esta opcion requeriría construir endpoints CRUD completos que aún no existen, más una interfaz propia en el backoffice de PrestaShop que los consuma.
+
+
+## Cómo ejecutar en local
+
+### Requisitos previos
+
+- Docker instalado.
+
+### Pasos
+
+**1. Clonar el repositorio**
+
+```bash
+git clone <url-del-repo>
+cd <carpeta-creada>
+```
+
+**2. Levantar los contenedores**
+
+```bash
+docker compose up -d --build
+```
+
+Esto levanta tres servicios.  
+El entrypoint instala automáticamente las dependencias de Composer si no existen.
+
+**3. Ejecutar las migraciones**
+
+```bash
+docker exec banner-case-m-app-1 php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+**4. Cargar los datos de ejemplo**
+
+```bash
+docker exec banner-case-m-app-1 php bin/console doctrine:fixtures:load --no-interaction
+```
+
+### URLs disponibles
+
+| URL | Descripción |
+|---|---|
+| `http://localhost:8080/admin` | Panel de administración (EasyAdmin) — requiere login |
+| `http://localhost:8080/banners?lang=es` | Vista frontend con banners activos (pública) |
+| `http://localhost:8080/api/banners?lang=es` | API JSON con banners activos (pública) |
+
+El parámetro `lang` permite escoger el idioma de los banners.
+
+#### Credenciales del panel de administración
+
+| Campo | Valor |
+|---|---|
+| Usuario | `admin` |
+| Contraseña | `admin` |
+
+> **Nota:** La contraseña está almacenada con hash bcrypt en `config/packages/security.yaml`. Para cambiarla, genera un nuevo hash con:
+> ```bash
+> docker exec banner-case-m-app-1 php bin/console security:hash-password
+> ```
+> y sustituye el valor del campo `password` en `config/packages/security.yaml`. En producción se recomienda sustituir el proveedor en memoria por uno de base de datos.
+
+### Ejecutar los tests
+
+```bash
+docker exec banner-case-m-app-1 php bin/phpunit
+```
+
 ## Arquitectura
 
 ### Modelo de datos
