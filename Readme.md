@@ -72,16 +72,21 @@ docker compose up -d --build
 Esto levanta tres servicios.  
 El entrypoint instala automáticamente las dependencias de Composer si no existen.
 
+> **⚠️ Importante:** El `composer install` se ejecuta dentro del contenedor al arrancar. Antes de continuar, espera a que aparezca el mensaje `ready to handle connections` en los logs:
+> ```bash
+> docker compose logs app -f
+> ```
+
 **3. Ejecutar las migraciones**
 
 ```bash
-docker exec banner-case-m-app-1 php bin/console doctrine:migrations:migrate --no-interaction
+docker exec case-banner-symfony-app-1 php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
 **4. Cargar los datos de ejemplo**
 
 ```bash
-docker exec banner-case-m-app-1 php bin/console doctrine:fixtures:load --no-interaction
+docker exec case-banner-symfony-app-1 php bin/console doctrine:fixtures:load --no-interaction
 ```
 
 ### URLs disponibles
@@ -103,14 +108,14 @@ El parámetro `lang` permite escoger el idioma de los banners.
 
 > **Nota:** La contraseña está almacenada con hash bcrypt en `config/packages/security.yaml`. Para cambiarla, genera un nuevo hash con:
 > ```bash
-> docker exec banner-case-m-app-1 php bin/console security:hash-password
+> docker exec case-banner-symfony-app-1 php bin/console security:hash-password
 > ```
 > y sustituye el valor del campo `password` en `config/packages/security.yaml`. En producción se recomienda sustituir el proveedor en memoria por uno de base de datos.
 
 ### Ejecutar los tests
 
 ```bash
-docker exec banner-case-m-app-1 php bin/phpunit
+docker exec case-banner-symfony-app-1 php bin/phpunit
 ```
 
 ## Arquitectura
